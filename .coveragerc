@@ -1,0 +1,37 @@
+# .coveragerc to control coverage.py
+
+[run]
+omit =
+    # Where the .coveragerc file contains file globs.
+    */tests/*
+
+    # Omit imported packages e.g. numpy, scipy.
+    */site-packages/*
+
+    # Omit weird inclusion of numba-generated code.
+    */__numba_array_expr_synthetic_module_/*
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+    # Ignore imports
+    from
+    import
+
+# Ignore spontaneous `No source for code` errors:
+# ignore_errors = True

@@ -1,0 +1,39 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apogeebacktest"
+version = "0.0.1"
+authors = [
+  { name="Tin Kei Cheng" },
+]
+description = "A backtest package for a long-short strategy using book-to-price ratio"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+apogeebacktest = "apogeebacktest.main:main_cli"
+
+[project.urls]
+homepage = "https://github.com/tinkei/apogeebacktest/wiki"
+repository = "https://github.com/tinkei/apogeebacktest"
+"Bug Tracker" = "https://github.com/tinkei/apogeebacktest/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.csv",
+    "*.xlsx",
+    "*.ipynb",
+]

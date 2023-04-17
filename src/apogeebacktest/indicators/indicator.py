@@ -7,4 +7,4 @@ class Indicator(ABC):
     @abstractmethod
     def getValue(self):
         """Get value of indicator."""
-        NotImplementedError()
+        raise NotImplementedError

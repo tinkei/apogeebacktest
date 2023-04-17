@@ -7,4 +7,4 @@ class Signal(ABC):
     @abstractmethod
     def getSignal(self):
         """Get trade signal."""
-        NotImplementedError()
+        raise NotImplementedError

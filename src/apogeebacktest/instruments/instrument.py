@@ -37,4 +37,4 @@ class Instrument(ABC):
         float
             Monthly geometric return.
         """
-        NotImplementedError()
+        raise NotImplementedError

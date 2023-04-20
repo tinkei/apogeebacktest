@@ -67,10 +67,10 @@ Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio perf
 ## To do
 
 - [x] Test calculation of returns.
+- [x] Parallelize `Strategy` evaluation in `main.py`.
+- [x] Decouple `Market` from `pandas.DataFrame`.
+- [ ] Recover lost vectorization from OOP abstraction.
 - [ ] Refactor `date` from `str` to a real `datetime` object.
-- [ ] Refactor `Market`'s dependence on `DataFrame`.
 - [ ] Use `logging` library instead of `print` statements.
 - [ ] Persist results of `Strategy` evaluation.
-- [x] Parallelize `Strategy` evaluation in `main.py`.
-- [ ] Reenable lost vectorization from OOP abstraction.
 - [ ] Add MC simulation to compute VaR based on backtest statistics.

@@ -7,6 +7,7 @@ from pathlib import Path
 from functools import lru_cache
 
 from apogeebacktest.instruments import Instrument, Stock
+from apogeebacktest.data.pd_connector import PandasXLSXConnector
 
 
 class __Market:
@@ -14,54 +15,44 @@ class __Market:
 
     def __init__(self):
         
-        # dataset_filename = 'CaseStudy/dataset.xlsx'
-        resources_path = (Path(__file__) / '../../resources' ).resolve()
-        data_file_path = (resources_path / 'dataset.xlsx').resolve()
-        self.__data_file_path = data_file_path
-        self._loadPandasDataFrame(data_file_path)
+        # Load default market data.
+        resources_folder = (Path(__file__) / '../../resources' ).resolve()
+        data_path = (resources_folder / 'dataset.xlsx').resolve()
+        self.__data_path = data_path
+        self.__market_data_connector = PandasXLSXConnector(data_path, 'Return')
+        self.__book_to_price_connector = PandasXLSXConnector(data_path, 'Book to price')
 
 
     def __call__(self):
         return self
 
 
-    def switchDataSource(self, path:str) -> None:
+    def switchReturnsDataSource(self, data_path:str) -> None:
         """Switch to another `.xlsx` data source.
 
         Parameters
         ----------
-        path : str
+        data_path : str
             Path to the data file.
         """
 
-        data_file_path = Path(path).resolve()
-        self.__data_file_path = data_file_path.resolve()
-        self._loadPandasDataFrame(data_file_path)
+        self.__data_path = data_path
+        self.__market_data_connector = PandasXLSXConnector(data_path, 'Return')
         self._clearCaches()
 
 
-    def _loadPandasDataFrame(self, data_file_path:str) -> None:
-        """Load a `.xlsx` data source into pandas.DataFrame.
+    def switchBookToPriceDataSource(self, data_path:str) -> None:
+        """Switch to another `.xlsx` data source.
 
         Parameters
         ----------
-        data_file_path : str
+        data_path : str
             Path to the data file.
         """
 
-        data_bp = pd.read_excel(data_file_path, sheet_name='Book to price', index_col=0)
-        data_bp.index = [name.split(' ')[1] for name in data_bp.index]
-        data_bp.index = data_bp.index.astype(int)
-        data_bp.sort_index(inplace=True)
-        data_bp.columns = data_bp.columns.astype(str)
-        self.__data_bp = data_bp
-
-        data_re = pd.read_excel(data_file_path, sheet_name='Return', index_col=0)
-        data_re.index = [name.split(' ')[1] for name in data_re.index]
-        data_re.index = data_re.index.astype(int)
-        data_re.sort_index(inplace=True)
-        data_re.columns = data_re.columns.astype(str)
-        self.__data_re = data_re
+        self.__data_path = data_path
+        self.__book_to_price_connector = PandasXLSXConnector(data_path, 'Book to price')
+        self._clearCaches()
 
 
     def _clearCaches(self) -> None:
@@ -74,9 +65,9 @@ class __Market:
         self.getBP.cache_clear()
 
 
-    def getDataFilePath(self) -> Path:
-        """Get file path of current data source."""
-        return self.__data_file_path
+    def getDataPath(self) -> Path:
+        """Get file path to current data source."""
+        return self.__data_path
 
 
     @lru_cache(maxsize=1)
@@ -88,7 +79,7 @@ class __Market:
         np.array
             An array of dates.
         """
-        return self.__data_re.columns.to_numpy()
+        return self.__market_data_connector.getTimeframe()
 
 
     @lru_cache(maxsize=1)
@@ -100,7 +91,7 @@ class __Market:
         np.array
             List of tradable stock codes.
         """
-        return self.__data_re.index.astype(str).to_numpy()
+        return self.__market_data_connector.getInstruments()
 
 
     @lru_cache(maxsize=1000)
@@ -141,9 +132,9 @@ class __Market:
         Returns
         -------
         float
-            Return
+            Instrument return.
         """
-        return self.__data_re.loc[int(code), date]
+        return self.__market_data_connector.getData(code, date)
 
 
     @lru_cache(maxsize=10000)
@@ -162,7 +153,7 @@ class __Market:
         float
             Book-to-price ratio.
         """
-        return self.__data_bp.loc[int(code), date]
+        return self.__book_to_price_connector.getData(code, date)
 
 
 # Singleton.

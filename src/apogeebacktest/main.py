@@ -89,7 +89,7 @@ def main_cli(args:Optional[List[str]]=None):
             print(f'Setting data source to {args.data}')
         Market.switchDataSource(args.data)
     if args.verbose:
-        print(f'Current data source: {Market.getDataFilePath()}\n')
+        print(f'Current data source: {Market.getDataPath()}\n')
 
     if args.verbose:
         print('Going to backtest the following strategies:')

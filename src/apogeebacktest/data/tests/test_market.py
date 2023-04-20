@@ -10,10 +10,11 @@ def test_Market():
     market = Market()
 
     # Test switching data source.
-    resources_path = (Path(__file__) / '../../../resources' ).resolve()
-    data_file_path = resources_path / 'dataset.xlsx'
-    market.switchDataSource(data_file_path)
-    assert data_file_path == market.getDataFilePath()
+    resources_folder = (Path(__file__) / '../../../resources' ).resolve()
+    data_path = resources_folder / 'dataset.xlsx'
+    market.switchReturnsDataSource(data_path)
+    market.switchBookToPriceDataSource(data_path)
+    assert data_path == market.getDataPath()
 
     # Test correctly reading reference data.
     assert market.getTimeframe()[10] == '20001031'

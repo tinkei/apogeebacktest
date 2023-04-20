@@ -1,8 +1,6 @@
 #!/usr/bin/env python
+"""Entrypoint of the module."""
 
-"""Primary functions of the module."""
-
-import os
 import sys
 import inspect
 import argparse
@@ -10,12 +8,14 @@ import pathlib
 import numpy as np
 from typing import List
 from functools import reduce
+from multiprocessing import Pool
 
-# import apogeebacktest
 import apogeebacktest.strategies
 from apogeebacktest.data import Market
 from apogeebacktest.risks import VaR, CVaR
 from apogeebacktest.utils import plot_performance
+from apogeebacktest.utils import GeomReturn, LogReturn
+from apogeebacktest.strategies import Strategy
 
 
 def parse_arguments(args:List[str]) -> argparse.Namespace:
@@ -61,6 +61,10 @@ def parse_arguments(args:List[str]) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
+def parallel_eval(strategy_name:str, strategy_instance:Strategy):
+    return strategy_instance.evalStrategy()
+
+
 def main_cli(args=None):
     """Entry point of the module."""
 
@@ -104,22 +108,25 @@ def main_cli(args=None):
     all_returns = {}
     all_log_returns = {}
 
-    for strategy in strategies_to_execute:
-        print(f'Backtest summary of {strategy[0]} (monthly values)')
-        timeframe, geom_returns, log_returns = strategy[1]().evalStrategy()
-        all_timeframe[strategy[0]] = timeframe
-        all_returns[strategy[0]] = geom_returns
-        all_log_returns[strategy[0]] = log_returns
-        avg_geom_return = np.power(reduce(lambda R, r: R * (1+r), geom_returns, 1), 1/len(geom_returns)) - 1
-        avg_log_return = np.mean(log_returns)
-        std_log_return = np.std(log_returns)
-        print(f'Time range            : {timeframe[0]} to {timeframe[-1]}')
-        print(f'Average geom. return  : {avg_geom_return:+.6f}')
-        print(f'Average log return    : {avg_log_return:+.6f}')
-        print(f'Average volatility    : {std_log_return:+.6f}')
-        print(f'Value at Risk (log)   : {VaR.eval(log_returns):+.6f}')
-        print(f'Conditional VaR (log) : {CVaR.eval(log_returns):+.6f}')
-        print('')
+    with Pool(processes=min(8, len(strategies_to_execute))) as pool:
+        strategies_executed = [pool.apply_async(parallel_eval, (strategy[0], strategy[1]())) for strategy in strategies_to_execute]
+        for strategy, res in zip(strategies_to_execute, strategies_executed):
+            # timeframe, geom_returns, log_returns = strategy[1]().evalStrategy()
+            timeframe, geom_returns, log_returns = res.get()
+            all_timeframe[strategy[0]] = timeframe
+            all_returns[strategy[0]] = geom_returns
+            all_log_returns[strategy[0]] = log_returns
+            avg_geom_return = np.power(reduce(lambda R, r: R * (1+r), geom_returns, 1), 1/len(geom_returns)) - 1
+            avg_log_return = np.mean(log_returns)
+            std_log_return = np.std(log_returns)
+            print(f'Backtest summary of {strategy[0]} (monthly values)')
+            print(f'Time range            : {timeframe[0]} to {timeframe[-1]}')
+            print(f'Average geom return   : {avg_geom_return:+.6f}')
+            print(f'Average log return    : {avg_log_return:+.6f}')
+            print(f'Average volatility    : {std_log_return:+.6f}')
+            print(f'Value at Risk (log)   : {VaR.eval(log_returns):+.6f}')
+            print(f'Conditional VaR (log) : {CVaR.eval(log_returns):+.6f}')
+            print('')
 
     pathlib.Path(args.output_path).mkdir(parents=True, exist_ok=True)
     plot_performance(args.output_path, strategies_to_execute, all_timeframe, all_returns, all_log_returns)

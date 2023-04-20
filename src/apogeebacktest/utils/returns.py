@@ -896,3 +896,71 @@ class LogReturn:
         if weights is not None and weights.ndim > 1:
             # Dynamically rebalance the portfolio over time.
             return self.averageOverPortfolio(weights, portfolio_axis).accumulateOverTime(portfolio_axis)
+
+
+    # ==================================================
+    # Builder pattern not implemented for the following.
+    # ==================================================
+
+    def annualizedReturn(log_return:float, T:float) -> float:
+        """Compute annualized return, a.k.a. drift.
+
+        Parameters
+        ----------
+        log_return: float
+            Overall log return.
+        T: float
+            Total time over which the above log return is calculated. Unit: years.
+            e.g. If the input is average monthly return, then T=1/12.
+            If the input is total return over 3 years, then T=3.
+
+        Returns
+        -------
+        float
+            Annualized portfolio log return.
+        """
+        return log_return / T
+
+
+    def volatility(returns:np.array, weights:np.array=None, portfolio_axis:int=1) -> float:
+        """Compute volatility.
+
+        Parameters
+        ----------
+        returns: np.array
+            Log return. 1D or 2D. Default shape (time,) or (time,portfolio).
+        weights: np.array
+            Portfolio weights. 1D or 2D, if exists. Default shape (portfolio,) or (time,portfolio).
+        portfolio_axis: int
+            Axis where the portfolio weights at a slice of time is given, if exists.
+            Inferred if not provided.
+
+        Returns
+        -------
+        float
+            Volatility of portfolio.
+        """
+        assert returns is not None and returns.ndim > 0
+        if returns.ndim == 1:
+            return np.std(returns)
+        else:
+            return np.std(LogReturn.averageOverPortfolio(returns, weights, portfolio_axis))
+
+
+    def annualizedVolatility(volatility:float, dt:float) -> float:
+        """Compute annualized volatility.
+
+        Parameters
+        ----------
+        volatility: float
+            Volatility over a certain time period.
+        dt: float
+            Time step between datapoints when computing the above volatility, per unit year.
+            e.g. Monthly data: dt=1/12; weekly data: dt=1/52.; daily data: dt=1/252.
+
+        Returns
+        -------
+        float
+            Annualized volatility.
+        """
+        return volatility / np.sqrt(dt)

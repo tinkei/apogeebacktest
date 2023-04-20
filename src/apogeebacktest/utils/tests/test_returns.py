@@ -7,13 +7,29 @@ from apogeebacktest.utils import GeomReturn, LogReturn
 def test_Returns_static():
     """Test a fixed portfolio that does not rebalance."""
 
-    # Portfolio of 10 stocks over 50 time periods.
-    # geom_returns = np.random.uniform(-0.05, 0.05, size=(50,10))
+    # Portfolio of 100 stocks over 240 time periods (20 years, monthly data).
+    # geom_returns = np.random.uniform(-0.05, 0.05, size=(240,100))
     # log_returns = GeomReturn.toLogReturn(geom_returns)
-    log_returns = np.random.randn(50,10)
+    # log_returns = np.random.randn(240,100)
+    log_returns = np.random.normal(loc=0.0, scale=np.sqrt(1/12), size=(240,100))
     geom_returns = LogReturn.toGeomReturn(log_returns)
     weights = np.ones_like(geom_returns[0,:]) / len(geom_returns[0,:])
-    assert weights.shape == (10,)
+    assert weights.shape == (100,)
+
+    # Test annualized return and volatility.
+    drift = LogReturn.annualizedReturn(LogReturn.compoundOverPortfolioAndTime(log_returns, weights, portfolio_axis=1), T=240/12)
+    drift_of_one = LogReturn.annualizedReturn(LogReturn.compoundOverTime(log_returns[:,0]), T=240/12)
+    total_volatility = LogReturn.volatility(log_returns, weights, portfolio_axis=1)
+    volatility = LogReturn.annualizedVolatility(total_volatility, dt=1/12)
+    vol_of_one = LogReturn.volatility(log_returns[:,0], weights, portfolio_axis=1)
+    vol_of_one = LogReturn.annualizedVolatility(vol_of_one, dt=1/12)
+    print(f'Drift of diversified portfolio: {drift:+.6f}')
+    print(f'Drift of a single instrument  : {drift_of_one:+.6f} (close to 0.0)')
+    print(f'Annualized vol of diversified portfolio   : {volatility:.6f}')
+    print(f'Annualized vol of de-diversified portfolio: {volatility*np.sqrt(100):.6f} (close to 1.0)')
+    print(f'Annualized vol of a single instrument     : {vol_of_one:.6f} (close to 1.0)')
+    assert LogReturn.annualizedReturn(1.23, T=13) == 1.23 / 13
+    assert LogReturn.annualizedVolatility(1.23, dt=1/12) == 1.23 * np.sqrt(12)
 
     # Assert conversion between geometric and logarithmic returns.
     assert np.allclose(geom_returns, LogReturn.toGeomReturn(GeomReturn.toLogReturn(geom_returns)))
@@ -79,11 +95,11 @@ def test_Returns_static():
 def test_Returns_dynamic():
     """Test a portfolio that rebalances every time step."""
 
-    # Portfolio of 10 stocks over 50 time periods.
-    geom_returns = np.random.uniform(-0.05, 0.05, size=(50,10))
+    # Portfolio of 10 stocks over 48 time periods.
+    geom_returns = np.random.uniform(-0.05, 0.05, size=(48,10))
     log_returns = GeomReturn.toLogReturn(geom_returns)
     weights = np.ones_like(geom_returns) / len(geom_returns[0,:])
-    assert weights.shape == (50,10)
+    assert weights.shape == (48,10)
     assert weights[0,0] == 1/10
 
     # Assert compounding returns over both portfolio and time.

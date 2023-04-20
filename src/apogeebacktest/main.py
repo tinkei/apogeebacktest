@@ -6,7 +6,6 @@ import inspect
 import argparse
 import pathlib
 import numpy as np
-from functools import reduce
 from multiprocessing import Pool
 from typing import Optional, List, Tuple
 
@@ -87,7 +86,8 @@ def main_cli(args:Optional[List[str]]=None):
     if args.data is not None:
         if args.verbose:
             print(f'Setting data source to {args.data}')
-        Market.switchDataSource(args.data)
+        Market.switchReturnsDataSource(args.data)
+        Market.switchBookToPriceDataSource(args.data)
     if args.verbose:
         print(f'Current data source: {Market.getDataPath()}\n')
 
@@ -117,14 +117,12 @@ def main_cli(args:Optional[List[str]]=None):
             all_timeframe[strategy[0]] = timeframe
             all_returns[strategy[0]] = geom_returns
             all_log_returns[strategy[0]] = log_returns
-            avg_geom_return = np.power(reduce(lambda R, r: R * (1+r), geom_returns, 1), 1/len(geom_returns)) - 1
-            avg_log_return = np.mean(log_returns)
-            std_log_return = np.std(log_returns)
             print(f'Backtest summary of {strategy[0]} (monthly values)')
             print(f'Time range            : {timeframe[0]} to {timeframe[-1]}')
-            print(f'Average geom return   : {avg_geom_return:+.6f}')
-            print(f'Average log return    : {avg_log_return:+.6f}')
-            print(f'Average volatility    : {std_log_return:+.6f}')
+            print(f'Average geom return   : {GeomReturn.averageOverTime(geom_returns):+.6f}')
+            print(f'Average log return    : {LogReturn.averageOverTime(log_returns):+.6f}')
+            print(f'Average volatility    : {np.std(log_returns):+.6f}')
+            print(f'Average volatility    : {LogReturn.volatility(log_returns):+.6f}')
             print(f'Value at Risk (log)   : {VaR.eval(log_returns):+.6f}')
             print(f'Conditional VaR (log) : {CVaR.eval(log_returns):+.6f}')
             print('')

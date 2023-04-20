@@ -6,6 +6,8 @@ from typing import Any, Tuple, List, Dict
 from apogeebacktest.strategies import Strategy
 from apogeebacktest.utils import GeomReturn, LogReturn
 
+plt.rcParams['backend'] = 'Agg'
+
 
 # def prod(cum, r):
 #     return cum*(1+r)

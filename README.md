@@ -58,17 +58,19 @@ A plot summarizing the performance will be created at `./backtest-output/Perform
 ## Under the hood
 
 A `Market` connects to a data source (currently only the sample `.xlsx` file) to obtain various information about an `Instrument` (e.g. its return and book-to-price ratio).
-A `Strategy` makes long and/or short trades in a `Market`. The selection of `Instrument`s to buy/sell in a `Portfolio` over time is based on a set of trading `Signal`s (a.k.a. _Attractiveness Score_), each of which is composed of a set of `Indicator`s (e.g. book-to-price ratio) computed from `Market` data.
+
+A (user-implemented subclass of) `Strategy` makes long and/or short trades in a `Market`. The selection of `Instrument`s to buy/sell in a `Portfolio` over time is based on a set of trading `Signal`s (a.k.a. _Attractiveness Score_), each of which is composed of a set of `Indicator`s (e.g. book-to-price ratio) computed from `Market` data.
 
 Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio performance, based on the defined `Strategy`, over the entire timeframe available in the `Market`, minus the "warm up" period required to compute a `Signal`. The resulting timeframe, geometric return, and log return, are _returned_ by the function call for postprocessing. For example, summary statistics can be computed, and charts can be plotted.
 
 
 ## To do
 
-- [ ] Test calculation of returns.
+- [x] Test calculation of returns.
 - [ ] Refactor `date` from `str` to a real `datetime` object.
 - [ ] Refactor `Market`'s dependence on `DataFrame`.
 - [ ] Use `logging` library instead of `print` statements.
 - [ ] Persist results of `Strategy` evaluation.
 - [ ] Parallelize `Strategy` evaluation.
+- [ ] Reenable lost vectorization from OOP abstraction.
 - [ ] Add MC simulation to compute VaR based on backtest statistics.

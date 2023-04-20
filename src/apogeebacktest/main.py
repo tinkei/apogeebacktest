@@ -6,9 +6,9 @@ import inspect
 import argparse
 import pathlib
 import numpy as np
-from typing import List
 from functools import reduce
 from multiprocessing import Pool
+from typing import Optional, List, Tuple
 
 import apogeebacktest.strategies
 from apogeebacktest.data import Market
@@ -61,11 +61,12 @@ def parse_arguments(args:List[str]) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-def parallel_eval(strategy_name:str, strategy_instance:Strategy):
+def parallel_eval(strategy_name:str, strategy_instance:Strategy) -> Tuple[np.array, np.array, np.array]:
+    """Wrapper for `multiprocessing.Pool.apply_async()`."""
     return strategy_instance.evalStrategy()
 
 
-def main_cli(args=None):
+def main_cli(args:Optional[List[str]]=None):
     """Entry point of the module."""
 
     if args is None:

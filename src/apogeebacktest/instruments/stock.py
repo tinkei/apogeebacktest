@@ -1,3 +1,5 @@
+from typing import Any
+
 from apogeebacktest.instruments import Instrument
 
 
@@ -38,7 +40,7 @@ class Stock(Instrument):
         del self._name
 
 
-    def getReturn(self, date) -> float:
+    def getReturn(self, date:Any) -> float:
         """Monthly geometric return.
 
         Parameters

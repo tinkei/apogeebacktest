@@ -8,6 +8,15 @@ class Portfolio(Instrument):
     """A portfolio of instruments, which itself is a composite instrument."""
 
     def __init__(self, codes_long:List[str]=[], codes_short:List[str]=[]):
+        """Initialize the portfolio.
+
+        Parameters
+        ----------
+        codes_long : List[str]
+            List of instruments to long.
+        codes_short : List[str]
+            List of instruments to short.
+        """
         from apogeebacktest.data import Market
         self.__market = Market()
         self._portfolio_long = {
@@ -26,8 +35,21 @@ class Portfolio(Instrument):
         }
 
 
-    def diffUpdatePortfolio(self, codes_long:List[str]=[], codes_short:List[str]=[]):
-        """Execute buy/sell trades on the existing portfolio to match a given new portfolio state."""
+    def diffUpdatePortfolio(self, codes_long:List[str]=[], codes_short:List[str]=[]) -> List[str]:
+        """Execute buy/sell trades on the existing portfolio to match a given new portfolio state.
+
+        Parameters
+        ----------
+        codes_long : List[str]
+            List of instruments to long.
+        codes_short : List[str]
+            List of instruments to short.
+
+        Returns
+        -------
+        List[str]
+            List of orders executed.
+        """
         orders = []
 
         new_long = set(self._portfolio_long.keys()) ^ set(codes_long)

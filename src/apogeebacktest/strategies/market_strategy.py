@@ -15,14 +15,21 @@ class MarketStrategy(Strategy):
         self._timeframe = self.__market.getTimeframe()
 
 
-    def createPortfolio(self):
+    def createPortfolio(self) -> None:
         """Create an initial portfolio."""
         instruments = self.__market.getInstruments()
         self._portfolio = Portfolio(instruments)
 
 
-    def updatePortfolio(self, date):
-        """Update portfolio based on strategy/signal/indicator."""
+    def updatePortfolio(self, date:Any) -> None:
+        """Update portfolio based on strategy/signal/indicator.
+
+        Parameters
+        ----------
+        date : Any
+            Date on which the portfolio is updated.
+            Remember that the performance evaluation must be done at a later date.
+        """
         if self._portfolio is None:
             self.createPortfolio()
         # There is no update since we are holding the market portfolio.

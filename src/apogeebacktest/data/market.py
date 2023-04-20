@@ -25,7 +25,14 @@ class __Market:
         return self
 
 
-    def switchDataSource(self, path:str):
+    def switchDataSource(self, path:str) -> None:
+        """Switch to another `.xlsx` data source.
+
+        Parameters
+        ----------
+        path : str
+            Path to the data file.
+        """
 
         data_file_path = Path(path).resolve()
         self.__data_file_path = data_file_path.resolve()
@@ -33,7 +40,14 @@ class __Market:
         self._clearCaches()
 
 
-    def _loadPandasDataFrame(self, data_file_path:str):
+    def _loadPandasDataFrame(self, data_file_path:str) -> None:
+        """Load a `.xlsx` data source into pandas.DataFrame.
+
+        Parameters
+        ----------
+        data_file_path : str
+            Path to the data file.
+        """
 
         data_bp = pd.read_excel(data_file_path, sheet_name='Book to price', index_col=0)
         data_bp.index = [name.split(' ')[1] for name in data_bp.index]
@@ -61,36 +75,93 @@ class __Market:
 
 
     def getDataFilePath(self) -> Path:
+        """Get file path of current data source."""
         return self.__data_file_path
 
 
     @lru_cache(maxsize=1)
     def getTimeframe(self) -> np.ndarray:
+        """Get the complete trading timeframe available in the market.
+
+        Returns
+        -------
+        np.array
+            An array of dates.
+        """
         return self.__data_re.columns.to_numpy()
 
 
     @lru_cache(maxsize=1)
     def getInstruments(self) -> np.ndarray:
+        """Get the complete list of tradable instruments in the market.
+
+        Returns
+        -------
+        np.array
+            List of tradable stock codes.
+        """
         return self.__data_re.index.astype(str).to_numpy()
 
 
     @lru_cache(maxsize=1000)
     def getName(self, code:str) -> str:
+        """Get the name of instrument given its listed code.
+
+        Returns
+        -------
+        str
+            Name of instrument.
+        """
         return f'Stock {code}'
 
 
     @lru_cache(maxsize=1000)
     def getType(self, code:str) -> Instrument:
+        """Get the type of instrument given its listed code.
+
+        Returns
+        -------
+        Instrument
+            Class of the instrument.
+        """
         return Stock
 
 
     @lru_cache(maxsize=10000)
     def getReturn(self, code:str, date:Any) -> float:
+        """Get the return of an instrument given its listed code and trading day.
+
+        Parameters
+        ----------
+        code : str
+            Instrument's listed code.
+        date : any
+            Date to evaluate return.
+
+        Returns
+        -------
+        float
+            Return
+        """
         return self.__data_re.loc[int(code), date]
 
 
     @lru_cache(maxsize=10000)
     def getBP(self, code:str, date:Any) -> float:
+        """Get the book-to-price ratio of an instrument given its listed code and trading day.
+
+        Parameters
+        ----------
+        code : str
+            Instrument's listed code.
+        date : any
+            Date to evaluate book-to-price ratio.
+
+        Returns
+        -------
+        float
+            Book-to-price ratio.
+        """
         return self.__data_bp.loc[int(code), date]
 
 

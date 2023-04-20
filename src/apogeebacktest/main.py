@@ -106,11 +106,11 @@ def main_cli(args=None):
 
     for strategy in strategies_to_execute:
         print(f'Backtest summary of {strategy[0]} (monthly values)')
-        timeframe, returns, log_returns = strategy[1]().evalStrategy()
+        timeframe, geom_returns, log_returns = strategy[1]().evalStrategy()
         all_timeframe[strategy[0]] = timeframe
-        all_returns[strategy[0]] = returns
+        all_returns[strategy[0]] = geom_returns
         all_log_returns[strategy[0]] = log_returns
-        avg_geom_return = np.power(reduce(lambda R, r: R * (1+r), returns, 1), 1/len(returns)) - 1
+        avg_geom_return = np.power(reduce(lambda R, r: R * (1+r), geom_returns, 1), 1/len(geom_returns)) - 1
         avg_log_return = np.mean(log_returns)
         std_log_return = np.std(log_returns)
         print(f'Time range            : {timeframe[0]} to {timeframe[-1]}')

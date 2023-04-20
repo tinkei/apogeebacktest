@@ -40,16 +40,16 @@ class MarketStrategy(Strategy):
         Returns
         -------
         Tuple[np.array, np.array, np.array]
-            A tuple of (timeframe, returns, log_returns)
+            A tuple of (timeframe, geom_returns, log_returns)
         """
         if timeframe is None:
             timeframe = np.array(self._timeframe)
         else:
             timeframe = np.array(timeframe)
-        returns = np.zeros_like(timeframe, dtype=float)
+        geom_returns = np.zeros_like(timeframe, dtype=float)
         log_returns = np.zeros_like(timeframe, dtype=float)
         for i, date in enumerate(timeframe):
             self.updatePortfolio(date)
-            returns[i] = self._portfolio.getReturn(date)
+            geom_returns[i] = self._portfolio.getReturn(date)
             log_returns[i] = self._portfolio.getLogReturn(date)
-        return timeframe, returns, log_returns
+        return timeframe, geom_returns, log_returns

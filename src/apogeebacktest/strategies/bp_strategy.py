@@ -51,21 +51,21 @@ class BestBPStrategy(Strategy):
         Returns
         -------
         Tuple[np.array, np.array, np.array]
-            A tuple of (timeframe, returns, log_returns)
+            A tuple of (timeframe, geom_returns, log_returns)
         """
         if timeframe is None:
             timeframe = np.array(self._timeframe)
         else:
             timeframe = np.array(timeframe)
-        returns = np.zeros_like(timeframe[1:], dtype=float)
+        geom_returns = np.zeros_like(timeframe[1:], dtype=float)
         log_returns = np.zeros_like(timeframe[1:], dtype=float)
         for i in range(len(timeframe[1:])):
             # print(f'Updated portfolio selection on {timeframe[i]}.')
             self.updatePortfolio(timeframe[i])
             # print(f'Evaluated portfolio returns on {timeframe[i+1]}.\n')
-            returns[i] = self._portfolio.getReturn(timeframe[i+1])
+            geom_returns[i] = self._portfolio.getReturn(timeframe[i+1])
             log_returns[i] = self._portfolio.getLogReturn(timeframe[i+1])
-        return timeframe[1:], returns, log_returns
+        return timeframe[1:], geom_returns, log_returns
 
 
 
@@ -113,21 +113,21 @@ class WorstBPStrategy(Strategy):
         Returns
         -------
         Tuple[np.array, np.array, np.array]
-            A tuple of (timeframe, returns, log_returns)
+            A tuple of (timeframe, geom_returns, log_returns)
         """
         if timeframe is None:
             timeframe = np.array(self._timeframe)
         else:
             timeframe = np.array(timeframe)
-        returns = np.zeros_like(timeframe[1:], dtype=float)
+        geom_returns = np.zeros_like(timeframe[1:], dtype=float)
         log_returns = np.zeros_like(timeframe[1:], dtype=float)
         for i in range(len(timeframe[1:])):
             # print(f'Updated portfolio selection on {timeframe[i]}.')
             self.updatePortfolio(timeframe[i])
             # print(f'Evaluated portfolio returns on {timeframe[i+1]}.\n')
-            returns[i] = self._portfolio.getReturn(timeframe[i+1])
+            geom_returns[i] = self._portfolio.getReturn(timeframe[i+1])
             log_returns[i] = self._portfolio.getLogReturn(timeframe[i+1])
-        return timeframe[1:], returns, log_returns
+        return timeframe[1:], geom_returns, log_returns
 
 
 
@@ -178,19 +178,19 @@ class LongShortBPStrategy(Strategy):
         Returns
         -------
         Tuple[np.array, np.array, np.array]
-            A tuple of (timeframe, returns, log_returns)
+            A tuple of (timeframe, geom_returns, log_returns)
         """
         if timeframe is None:
             timeframe = np.array(self._timeframe)
         else:
             timeframe = np.array(timeframe)
-        returns = np.zeros_like(timeframe[1:], dtype=float)
+        geom_returns = np.zeros_like(timeframe[1:], dtype=float)
         log_returns = np.zeros_like(timeframe[1:], dtype=float)
         for i in range(len(timeframe[1:])):
             # print(f'Updated portfolio selection on {timeframe[i]}.')
             self.updatePortfolio(timeframe[i])
             # print(f'Evaluated portfolio returns on {timeframe[i+1]}.\n')
-            returns[i] = self._portfolio.getReturn(timeframe[i+1])
+            geom_returns[i] = self._portfolio.getReturn(timeframe[i+1])
             log_returns[i] = self._portfolio.getLogReturn(timeframe[i+1])
-        return timeframe[1:], returns, log_returns
+        return timeframe[1:], geom_returns, log_returns
 

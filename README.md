@@ -16,7 +16,7 @@ A backtest package for a long-short strategy using book-to-price ratio[^1].
 
 1. `pip install -r requirements.txt`
 1. `pip install -e .`  
-   or `python -m build` then `pip install -U dist/apogeebacktest-0.0.1-py3-none-any.whl --force-reinstall`
+   or `python -m build` then `pip install -U dist/apogeebacktest-0.0.2-py3-none-any.whl --force-reinstall`
 
 
 ## How-to
@@ -30,8 +30,8 @@ from apogeebacktest.risks import VaR, CVaR
 
 baseline = MarketStrategy()
 strategy = LongShortBPStrategy()
-timeframe_base, returns_base, log_returns_base = baseline.evalStrategy()
-timeframe_lsbp, returns_lsbp, log_returns_lsbp = strategy.evalStrategy()
+timeframe_base, geom_returns_base, log_returns_base = baseline.evalStrategy()
+timeframe_lsbp, geom_returns_lsbp, log_returns_lsbp = strategy.evalStrategy()
 
 print(f'Performance of baseline market portfolio')
 print(f'Average log return    : {np.mean(log_returns_base):+.6f}')

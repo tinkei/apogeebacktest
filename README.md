@@ -16,7 +16,7 @@ A backtest package for a long-short strategy using book-to-price ratio[^1].
 
 1. `pip install -r requirements.txt`
 1. `pip install -e .`  
-   or `python -m build` then `pip install -U dist/apogeebacktest-0.0.2-py3-none-any.whl --force-reinstall`
+   or `python -m build` then `pip install -U dist/apogeebacktest-0.0.3-py3-none-any.whl --force-reinstall`
 
 
 ## How-to

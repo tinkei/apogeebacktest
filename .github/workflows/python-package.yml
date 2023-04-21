@@ -29,8 +29,8 @@ jobs:
         with:
           name: apogeebacktest-build
           path: |
-            dist/apogeebacktest-0.0.2-py3-none-any.whl
-            dist/apogeebacktest-0.0.2.tar.gz
+            dist/apogeebacktest-0.0.3-py3-none-any.whl
+            dist/apogeebacktest-0.0.3.tar.gz
       - name: Test with pytest
         run: |
           pip install pytest pytest-cov

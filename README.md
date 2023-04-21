@@ -96,6 +96,6 @@ Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio perf
 - [ ] Fix potential race condition when switching data sources.
 - [ ] Test the strategies! Do it by hand or something.
 - [ ] Test `Portfolio`. See? Bug in constructor.
-- [ ] Add superclass `BPStrategy`.
+- [x] Add superclass `BPStrategy`.
 - [ ] Call superclass constructor when necessary.
-- [x] Mutables in constructor default argument are instantiated only once! Subsequent instances may be sharing the same object! Use `None` and put the instantiation inside the constructor.
+- [x] Mutables in constructor default arguments are instantiated only once! Subsequent instances will be sharing the same object! Use `None` and put the instantiation inside the constructor.

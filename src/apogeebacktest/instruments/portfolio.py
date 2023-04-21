@@ -7,18 +7,23 @@ from apogeebacktest.instruments import Instrument
 class Portfolio(Instrument):
     """A portfolio of instruments, which itself is a composite instrument."""
 
-    def __init__(self, codes_long:List[str]=[], codes_short:List[str]=[]):
+    def __init__(self, codes_long:Optional[List[str]]=None, codes_short:Optional[List[str]]=None):
         """Initialize the portfolio.
 
         Parameters
         ----------
-        codes_long : List[str]
+        codes_long : Optional[List[str]]
             List of instruments to long.
-        codes_short : List[str]
+        codes_short : Optional[List[str]]
             List of instruments to short.
         """
         from apogeebacktest.data import Market
         self.__market = Market()
+        if codes_long is None:
+            codes_long = []
+        if codes_short is None:
+            codes_short = []
+
         self._portfolio_long = {
             code : {
                 'code': code,
@@ -30,19 +35,19 @@ class Portfolio(Instrument):
             code : {
                 'code': code,
                 'instrument': self.__market.getType(code)(code),
-                'weight': 1 / len(codes_long),
+                'weight': 1 / len(codes_short),
             } for code in codes_short
         }
 
 
-    def diffUpdatePortfolio(self, codes_long:List[str]=[], codes_short:List[str]=[]) -> List[str]:
+    def diffUpdatePortfolio(self, codes_long:Optional[List[str]]=None, codes_short:Optional[List[str]]=None) -> List[str]:
         """Execute buy/sell trades on the existing portfolio to match a given new portfolio state.
 
         Parameters
         ----------
-        codes_long : List[str]
+        codes_long : Optional[List[str]]
             List of instruments to long.
-        codes_short : List[str]
+        codes_short : Optional[List[str]]
             List of instruments to short.
 
         Returns
@@ -50,6 +55,11 @@ class Portfolio(Instrument):
         List[str]
             List of orders executed.
         """
+        if codes_long is None:
+            codes_long = []
+        if codes_short is None:
+            codes_short = []
+
         orders = []
 
         new_long = set(self._portfolio_long.keys()) ^ set(codes_long)

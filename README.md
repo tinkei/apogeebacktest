@@ -98,4 +98,4 @@ Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio perf
 - [ ] Test `Portfolio`. See? Bug in constructor.
 - [ ] Add superclass `BPStrategy`.
 - [ ] Call superclass constructor when necessary.
-- [ ] Mutables in constructor default argument are instantiated only once! Subsequent instances may be sharing the same object! Use `None` and put the instantiation inside the constructor.
+- [x] Mutables in constructor default argument are instantiated only once! Subsequent instances may be sharing the same object! Use `None` and put the instantiation inside the constructor.

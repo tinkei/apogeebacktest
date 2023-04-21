@@ -10,15 +10,10 @@ class MarketStrategy(Strategy):
 
     def __init__(self):
         from apogeebacktest.data import Market
-        self._portfolio = None
         self.__market = Market()
-        self._timeframe = self.__market.getTimeframe()
-
-
-    def createPortfolio(self) -> None:
-        """Create an initial portfolio."""
         instruments = self.__market.getInstruments()
         self._portfolio = Portfolio(instruments)
+        self._timeframe = self.__market.getTimeframe()
 
 
     def updatePortfolio(self, date:Any) -> None:
@@ -30,9 +25,8 @@ class MarketStrategy(Strategy):
             Date on which the portfolio is updated.
             Remember that the performance evaluation must be done at a later date.
         """
-        if self._portfolio is None:
-            self.createPortfolio()
         # There is no update since we are holding the market portfolio.
+        pass
 
 
     def evalStrategy(self, timeframe:Optional[List[Any]]=None) -> Tuple[np.array, np.array, np.array]:

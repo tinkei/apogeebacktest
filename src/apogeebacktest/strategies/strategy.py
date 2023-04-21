@@ -7,12 +7,6 @@ class Strategy(ABC):
     """An abstract base class for strategy."""
 
     @abstractmethod
-    def createPortfolio(self) -> None:
-        """Create an initial portfolio."""
-        pass
-
-
-    @abstractmethod
     def updatePortfolio(self, date:Any) -> None:
         """Update portfolio selection based on strategy/signal/indicator.
 

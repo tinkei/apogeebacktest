@@ -121,7 +121,6 @@ def main_cli(args:Optional[List[str]]=None):
             print(f'Time range            : {timeframe[0]} to {timeframe[-1]}')
             print(f'Average geom return   : {GeomReturn.averageOverTime(geom_returns):+.6f}')
             print(f'Average log return    : {LogReturn.averageOverTime(log_returns):+.6f}')
-            print(f'Average volatility    : {np.std(log_returns):+.6f}')
             print(f'Average volatility    : {LogReturn.volatility(log_returns):+.6f}')
             print(f'Value at Risk (log)   : {VaR.eval(log_returns):+.6f}')
             print(f'Conditional VaR (log) : {CVaR.eval(log_returns):+.6f}')

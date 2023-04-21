@@ -26,6 +26,7 @@ In a project one can extend the base `Strategy` and evaluate the result as follo
 ```python
 import numpy as np
 from apogeebacktest.strategies import MarketStrategy, LongShortBPStrategy
+from apogeebacktest.utils import GeomReturn, LogReturn
 from apogeebacktest.risks import VaR, CVaR
 
 baseline = MarketStrategy()
@@ -34,16 +35,29 @@ timeframe_base, geom_returns_base, log_returns_base = baseline.evalStrategy()
 timeframe_lsbp, geom_returns_lsbp, log_returns_lsbp = strategy.evalStrategy()
 
 print(f'Performance of baseline market portfolio')
-print(f'Average log return    : {np.mean(log_returns_base):+.6f}')
-print(f'Average volatility    : {np.std(log_returns_base):+.6f}')
+print(f'Average log return    : {LogReturn.averageOverTime(log_returns_base):+.6f}')
+print(f'Average volatility    : {LogReturn.volatility(log_returns_base):+.6f}')
 print(f'Value at Risk (log)   : {VaR.eval(log_returns_base):+.6f}')
 print(f'Conditional VaR (log) : {CVaR.eval(log_returns_base):+.6f}')
 
 print(f'Performance of long-short strategy based on book-to-price ratio')
-print(f'Average log return    : {np.mean(log_returns_lsbp):+.6f}')
-print(f'Average volatility    : {np.std(log_returns_lsbp):+.6f}')
+print(f'Average log return    : {LogReturn.averageOverTime(log_returns_lsbp):+.6f}')
+print(f'Average volatility    : {LogReturn.volatility(log_returns_lsbp):+.6f}')
 print(f'Value at Risk (log)   : {VaR.eval(log_returns_lsbp):+.6f}')
 print(f'Conditional VaR (log) : {CVaR.eval(log_returns_lsbp):+.6f}')
+```
+
+```none
+>>> Performance of baseline market portfolio
+>>> Average log return    : +0.007678
+>>> Average volatility    : +0.056428
+>>> Value at Risk (log)   : -0.101199
+>>> Conditional VaR (log) : -0.115912
+>>> Performance of long-short strategy based on book-to-price ratio
+>>> Average log return    : +0.006820
+>>> Average volatility    : +0.066007
+>>> Value at Risk (log)   : -0.073275
+>>> Conditional VaR (log) : -0.167792
 ```
 
 Or execute a strategy directly through CLI:

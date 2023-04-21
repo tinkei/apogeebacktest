@@ -34,8 +34,8 @@ def test_Returns_static():
     # Assert conversion between geometric and logarithmic returns.
     assert np.allclose(geom_returns, LogReturn.toGeomReturn(GeomReturn.toLogReturn(geom_returns)))
     assert np.allclose(log_returns,  GeomReturn.toLogReturn(LogReturn.toGeomReturn(log_returns)))
-    assert np.allclose(geom_returns, GeomReturn(geom_returns).toLogReturn().toGeomReturn().result())
-    assert np.allclose(log_returns,  LogReturn(log_returns).toGeomReturn().toLogReturn().result())
+    assert np.allclose(geom_returns, GeomReturn(geom_returns)._toLogReturn()._toGeomReturn().result())
+    assert np.allclose(log_returns,  LogReturn(log_returns)._toGeomReturn()._toLogReturn().result())
 
     # Assert equivalent implementation with and without weights.
     assert np.allclose(GeomReturn.averageOverPortfolio(geom_returns), GeomReturn.averageOverPortfolio(geom_returns, weights))
@@ -61,13 +61,13 @@ def test_Returns_static():
     mixed_time_first = LogReturn.toGeomReturn(mixed_time_first)
     mixed_time_first = GeomReturn.averageOverPortfolio(mixed_time_first, weights, portfolio_axis=0)
     assert np.allclose(time_first, mixed_time_first)
-    assert np.allclose(time_first, GeomReturn(geom_returns).toLogReturn().compoundOverTime(portfolio_axis=1).toGeomReturn().averageOverPortfolio(weights, portfolio_axis=0).result())
+    assert np.allclose(time_first, GeomReturn(geom_returns)._toLogReturn()._compoundOverTime(portfolio_axis=1)._toGeomReturn()._averageOverPortfolio(weights, portfolio_axis=0).result())
     mixed_port_first = GeomReturn.averageOverPortfolio(geom_returns, weights, portfolio_axis=1)
     mixed_port_first = GeomReturn.toLogReturn(mixed_port_first)
     mixed_port_first = LogReturn.compoundOverTime(mixed_port_first)
     mixed_port_first = LogReturn.toGeomReturn(mixed_port_first)
     assert np.allclose(port_first, mixed_port_first)
-    assert np.allclose(port_first, GeomReturn(geom_returns).averageOverPortfolio(weights, portfolio_axis=1).toLogReturn().compoundOverTime().toGeomReturn().result())
+    assert np.allclose(port_first, GeomReturn(geom_returns)._averageOverPortfolio(weights, portfolio_axis=1)._toLogReturn()._compoundOverTime()._toGeomReturn().result())
 
     # Assert composite implementation.
     time_first_1d = GeomReturn.compoundOverPortfolioAndTime(geom_returns, weights, portfolio_axis=1)
@@ -81,13 +81,13 @@ def test_Returns_static():
     mixed_time_first = LogReturn.toGeomReturn(mixed_time_first)
     mixed_time_first = GeomReturn.averageOverPortfolio(mixed_time_first, weights, portfolio_axis=1)
     assert np.allclose(time_first, mixed_time_first)
-    assert np.allclose(time_first, GeomReturn(geom_returns).toLogReturn().accumulateOverTime(portfolio_axis=1).toGeomReturn().averageOverPortfolio(weights, portfolio_axis=1).result())
+    assert np.allclose(time_first, GeomReturn(geom_returns)._toLogReturn()._accumulateOverTime(portfolio_axis=1)._toGeomReturn()._averageOverPortfolio(weights, portfolio_axis=1).result())
     mixed_port_first = GeomReturn.averageOverPortfolio(geom_returns, weights, portfolio_axis=1)
     mixed_port_first = GeomReturn.toLogReturn(mixed_port_first)
     mixed_port_first = LogReturn.accumulateOverTime(mixed_port_first, portfolio_axis=1)
     mixed_port_first = LogReturn.toGeomReturn(mixed_port_first)
     assert np.allclose(port_first, mixed_port_first)
-    assert np.allclose(port_first, GeomReturn(geom_returns).averageOverPortfolio(weights, portfolio_axis=1).toLogReturn().accumulateOverTime(portfolio_axis=1).toGeomReturn().result())
+    assert np.allclose(port_first, GeomReturn(geom_returns)._averageOverPortfolio(weights, portfolio_axis=1)._toLogReturn()._accumulateOverTime(portfolio_axis=1)._toGeomReturn().result())
     time_first_1d = GeomReturn.accumulateOverPortfolioAndTime(geom_returns, weights, portfolio_axis=1)
     assert np.allclose(time_first, time_first_1d)
 
@@ -115,10 +115,16 @@ def test_Returns_dynamic():
     # Assert composite implementation.
     port_first_1d = GeomReturn.compoundOverPortfolioAndTime(geom_returns, weights, portfolio_axis=1)
     assert np.allclose(port_first, port_first_1d)
+    port_first = LogReturn.compoundOverTime(LogReturn.averageOverPortfolio(log_returns, weights, portfolio_axis=1))
+    port_first_1d = LogReturn.compoundOverPortfolioAndTime(log_returns, weights, portfolio_axis=1)
+    assert np.allclose(port_first, port_first_1d)
 
     # Do the same for accumulate.
     port_first = GeomReturn.accumulateOverTime(GeomReturn.averageOverPortfolio(geom_returns, weights, portfolio_axis=1))
     port_first_1d = GeomReturn.accumulateOverPortfolioAndTime(geom_returns, weights, portfolio_axis=1)
+    assert np.allclose(port_first, port_first_1d)
+    port_first = LogReturn.accumulateOverTime(LogReturn.averageOverPortfolio(log_returns, weights, portfolio_axis=1))
+    port_first_1d = LogReturn.accumulateOverPortfolioAndTime(log_returns, weights, portfolio_axis=1)
     assert np.allclose(port_first, port_first_1d)
 
 

@@ -88,3 +88,14 @@ Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio perf
 - [ ] Use `logging` library instead of `print` statements.
 - [ ] Persist results of `Strategy` evaluation.
 - [ ] Add MC simulation to compute VaR based on backtest statistics.
+
+
+## Feedbacks
+
+- [ ] Use dependency injection in `Market` class. User inject a `Connector`.
+- [ ] Fix potential race condition when switching data sources.
+- [ ] Test the strategies! Do it by hand or something.
+- [ ] Test `Portfolio`. See? Bug in constructor.
+- [ ] Add superclass `BPStrategy`.
+- [ ] Call superclass constructor when necessary.
+- [ ] Mutables in constructor default argument are instantiated only once! Subsequent instances may be sharing the same object! Use `None` and put the instantiation inside the constructor.

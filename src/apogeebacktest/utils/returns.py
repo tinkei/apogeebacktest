@@ -1,8 +1,16 @@
+from abc import ABC
 import numpy as np
 from functools import reduce
 
 
-class GeomReturn:
+class Return(ABC):
+    """An abstract base class for computing returns."""
+
+    def __init__(self, **kwargs) -> None:
+        super(Return, self).__init__()
+
+
+class GeomReturn(Return):
     """A collection of convenience functions for manipulating geometric returns.
 
     How geometric return averages across a portfolio differs from how it behaves over time.
@@ -13,7 +21,8 @@ class GeomReturn:
     $$LogR_{t} = ln{(S_{t} / S_{t-1})}$$
     """
 
-    def __init__(self, returns:np.array):
+    def __init__(self, returns:np.array, **kwargs) -> None:
+        super(GeomReturn, self).__init__(**kwargs)
         assert returns is not None
         self.__returns = returns
         # To enable builder pattern.
@@ -452,7 +461,7 @@ class GeomReturn:
             return self.averageOverPortfolio(weights, portfolio_axis).accumulateOverTime(portfolio_axis)
 
 
-class LogReturn:
+class LogReturn(Return):
     """A collection of convenience functions for manipulating logarithmic returns.
     
     How logarithmic return averages across a portfolio differs from how it behaves over time.
@@ -463,7 +472,8 @@ class LogReturn:
     $$LogR_{t} = ln{(S_{t} / S_{t-1})}$$
     """
 
-    def __init__(self, returns:np.array):
+    def __init__(self, returns:np.array, **kwargs) -> None:
+        super(LogReturn, self).__init__(**kwargs)
         assert returns is not None
         self.__returns = returns
         # To enable builder pattern.

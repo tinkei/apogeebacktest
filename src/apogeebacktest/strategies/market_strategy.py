@@ -8,7 +8,8 @@ from apogeebacktest.instruments import Portfolio
 class MarketStrategy(Strategy):
     """A strategy that purchases an equal-weight porftolio of the entire market."""
 
-    def __init__(self):
+    def __init__(self, **kwargs) -> None:
+        super(MarketStrategy, self).__init__(**kwargs)
         from apogeebacktest.data import Market
         self.__market = Market()
         instruments = self.__market.getInstruments()

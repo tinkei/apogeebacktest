@@ -6,7 +6,8 @@ from apogeebacktest.instruments import Instrument
 class Stock(Instrument):
     """A stock."""
 
-    def __init__(self, code:str):
+    def __init__(self, code:str, **kwargs) -> None:
+        super(Stock, self).__init__(**kwargs)
         from apogeebacktest.data import Market
         self.__market = Market()
         self._code = code

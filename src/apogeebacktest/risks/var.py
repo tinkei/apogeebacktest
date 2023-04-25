@@ -6,6 +6,10 @@ from apogeebacktest.risks import RiskMetric
 
 class VaR(RiskMetric):
 
+    def __init__(self, **kwargs) -> None:
+        super(VaR, self).__init__(**kwargs)
+
+
     @staticmethod
     def eval(returns:List[float], q:float=0.05) -> float:
         """Compute Value at Risk (VaR) of an array of returns.

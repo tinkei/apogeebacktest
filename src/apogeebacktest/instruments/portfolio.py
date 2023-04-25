@@ -7,7 +7,7 @@ from apogeebacktest.instruments import Instrument
 class Portfolio(Instrument):
     """A portfolio of instruments, which itself is a composite instrument."""
 
-    def __init__(self, codes_long:Optional[List[str]]=None, codes_short:Optional[List[str]]=None):
+    def __init__(self, codes_long:Optional[List[str]]=None, codes_short:Optional[List[str]]=None, **kwargs) -> None:
         """Initialize the portfolio.
 
         Parameters
@@ -17,6 +17,7 @@ class Portfolio(Instrument):
         codes_short : Optional[List[str]]
             List of instruments to short.
         """
+        super(Portfolio, self).__init__(**kwargs)
         from apogeebacktest.data import Market
         self.__market = Market()
         if codes_long is None:

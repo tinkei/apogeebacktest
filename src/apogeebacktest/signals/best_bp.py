@@ -8,7 +8,8 @@ from apogeebacktest.indicators import BookToPriceIndicator
 class BestBPSignal(Signal):
     """Best Book-to-Price ratio signal. The higher the better."""
 
-    def __init__(self):
+    def __init__(self, **kwargs) -> None:
+        super(BestBPSignal, self).__init__(**kwargs)
         from apogeebacktest.data import Market
         self.__market = Market()
 

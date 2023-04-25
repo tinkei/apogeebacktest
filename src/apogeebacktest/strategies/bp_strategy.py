@@ -12,7 +12,7 @@ from apogeebacktest.data import Market
 class BPStrategy(Strategy):
     """A strategy that selects porftolio based on book-to-price ratios."""
 
-    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None, **kwargs) -> None:
         """Constructor.
 
         Parameters
@@ -24,7 +24,7 @@ class BPStrategy(Strategy):
         timeframe : np.array
             Timeframe to trade this strategy.
         """
-        super().__init__()
+        super(BPStrategy, self).__init__(**kwargs)
         self.selection = selection
         if initial_portfolio is None:
             initial_portfolio = Portfolio()
@@ -92,7 +92,7 @@ class BPStrategy(Strategy):
 class BestBPStrategy(BPStrategy):
     """A strategy that longs an equal-weight porftolio of stocks with the highest book-to-price ratios."""
 
-    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None, **kwargs) -> None:
         """Constructor.
 
         Parameters
@@ -104,7 +104,7 @@ class BestBPStrategy(BPStrategy):
         timeframe : np.array
             Timeframe to trade this strategy.
         """
-        super().__init__(initial_portfolio, selection, timeframe)
+        super(BestBPStrategy, self).__init__(initial_portfolio, selection, timeframe, **kwargs)
 
 
     def updatePortfolio(self, date:Any) -> None:
@@ -128,7 +128,7 @@ class BestBPStrategy(BPStrategy):
 class WorstBPStrategy(BPStrategy):
     """A strategy that shorts an equal-weight porftolio of stocks with the lowest book-to-price ratios."""
 
-    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None, **kwargs) -> None:
         """Constructor.
 
         Parameters
@@ -140,7 +140,7 @@ class WorstBPStrategy(BPStrategy):
         timeframe : np.array
             Timeframe to trade this strategy.
         """
-        super().__init__(initial_portfolio, selection, timeframe)
+        super(WorstBPStrategy, self).__init__(initial_portfolio, selection, timeframe, **kwargs)
 
 
     def updatePortfolio(self, date:Any) -> None:
@@ -165,7 +165,7 @@ class LongShortBPStrategy(BPStrategy):
     """A strategy that longs an equal-weight porftolio of stocks with the highest 
     book-to-price ratios and shorts the lowest book-to-price ratios."""
 
-    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None, **kwargs) -> None:
         """Constructor.
 
         Parameters
@@ -177,7 +177,7 @@ class LongShortBPStrategy(BPStrategy):
         timeframe : np.array
             Timeframe to trade this strategy.
         """
-        super().__init__(initial_portfolio, selection, timeframe)
+        super(LongShortBPStrategy, self).__init__(initial_portfolio, selection, timeframe, **kwargs)
 
 
     def updatePortfolio(self, date:Any) -> None:

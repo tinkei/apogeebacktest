@@ -7,7 +7,8 @@ from apogeebacktest.data import Market
 class BookToPriceIndicator(Indicator):
     """Book-to-Price ratio."""
 
-    def __init__(self):
+    def __init__(self, **kwargs) -> None:
+        super(BookToPriceIndicator, self).__init__(**kwargs)
         self.__market = Market()
 
 

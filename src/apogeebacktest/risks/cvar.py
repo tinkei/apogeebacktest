@@ -6,6 +6,10 @@ from apogeebacktest.risks import RiskMetric, VaR
 
 class CVaR(RiskMetric):
 
+    def __init__(self, **kwargs) -> None:
+        super(CVaR, self).__init__(**kwargs)
+
+
     @staticmethod
     def eval(returns:List[float], q:float=0.05) -> float:
         """Compute Conditional Value at Risk (CVaR) of an array of geometric returns.

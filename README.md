@@ -124,6 +124,6 @@ Other tests were either asserting lookup values from the sample data, or 'integr
 - [ ] Test the strategies! Do it by hand or something.
 - [ ] Test `Portfolio`. See? Bug in constructor.
 - [x] Add superclass `BPStrategy`.
-- [ ] Call superclass constructor when necessary.
+- [x] Call superclass constructor when necessary.
 - [x] Mutables in constructor default arguments are instantiated only once! Subsequent instances will be sharing the same object! Use `None` and put the instantiation inside the constructor.
 - [ ] `WorstBPStrategy` should also be long-only. It is only shorted in the long-short strategy.

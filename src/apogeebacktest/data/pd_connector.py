@@ -4,13 +4,15 @@ import pandas as pd
 from pathlib import Path
 from typing import Any, Optional, List
 
+from apogeebacktest.data import Connector
 from apogeebacktest.instruments import Instrument, Stock
 
 
-class PandasXLSXConnector:
+class PandasXLSXConnector(Connector):
     """A thin wrapper over a pandas.DataFrame instance."""
 
-    def __init__(self, data_path:str, sheet_name:Optional[str]=None):
+    def __init__(self, data_path:str, sheet_name:Optional[str]=None, **kwargs) -> None:
+        super(PandasXLSXConnector, self).__init__(**kwargs)
         self.__data_path = data_path
         self._loadDataFrame(data_path, sheet_name)
 

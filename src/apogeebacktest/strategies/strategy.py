@@ -6,6 +6,10 @@ from typing import Any, Tuple
 class Strategy(ABC):
     """An abstract base class for strategy."""
 
+    def __init__(self, **kwargs) -> None:
+        super(Strategy, self).__init__()
+
+
     @abstractmethod
     def updatePortfolio(self, date:Any) -> None:
         """Update portfolio selection based on strategy/signal/indicator.

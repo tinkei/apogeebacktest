@@ -1,5 +1,5 @@
 """A singleton module of the entire market of all tradeable instruments and their price data."""
-from typing import Any, Optional, List
+from typing import Any, Optional, List, Type
 
 import numpy as np
 import pandas as pd
@@ -7,13 +7,14 @@ from pathlib import Path
 from functools import lru_cache
 
 from apogeebacktest.instruments import Instrument, Stock
-from apogeebacktest.data.pd_connector import PandasXLSXConnector
+from apogeebacktest.data import Connector, PandasXLSXConnector
 
 
 class __Market:
     """A class of the entire market of all tradeable instruments and their price data."""
 
-    def __init__(self):
+    def __init__(self, connection:List[Connector]=None, **kwargs) -> None:
+        super(__Market, self).__init__()
         
         # Load default market data.
         resources_folder = (Path(__file__) / '../../resources' ).resolve()
@@ -107,7 +108,7 @@ class __Market:
 
 
     @lru_cache(maxsize=1000)
-    def getType(self, code:str) -> Instrument:
+    def getType(self, code:str) -> Type['Instrument']:
         """Get the type of instrument given its listed code.
 
         Returns

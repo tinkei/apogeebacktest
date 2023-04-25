@@ -7,7 +7,8 @@ class Instrument(ABC):
     # If we add @abstractmethod, this abstract class can't be instantiated.
     # But then subclasses will be forced to implement __init__()...
     # @abstractmethod
-    def __init__(self, multiplier:int=1):
+    def __init__(self, multiplier:int=1, **kwargs) -> None:
+        super(Instrument, self).__init__()
         self._multiplier = multiplier
 
 

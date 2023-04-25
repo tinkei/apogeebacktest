@@ -78,6 +78,33 @@ A (user-implemented subclass of) `Strategy` makes long and/or short trades in a 
 Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio performance, based on the defined `Strategy`, over the entire timeframe available in the `Market`, minus the "warm up" period required to compute a `Signal`. The resulting timeframe, geometric return, and log return, are _returned_ by the function call for postprocessing. For example, summary statistics can be computed, and charts can be plotted.
 
 
+## Thought process
+
+The long-short strategy was first replicated using Jupyter Notebook `CaseStudy-v1-ExploreData.ipynb`.
+Then the project backbone was ported from my previous works (CLI, CI/CD, build script, tests, directory structure).
+I then designed the architecture to decouple the framework into four components:
+* Data I/O;
+* Portfolio management;
+* Strategy implementation; and
+* Postprocessing (plotting).
+
+With a soft 4-hour limit, I focused on creating the `Strategy` components to maximize reusability.
+Steps that were often reused were grouped together into a base class.
+The composite pattern could in principle be used, but was not explicitly implemented.
+
+Next, a `Portfolio` class was implemented to keep track of the current holdings.
+Algorithms for computing returns were implmented both as static methods and using the method chaining.
+The latter was done to simplify reduction over portfolio returns and returns over time, and the conversion between geometric returns and logarithmic returns.
+
+The data I/O was abstracted to hide behind a `Market` singleton interface, with the data sources passed during construction through `Connector` objects (mentioned, but not implemented).
+
+Finally, the plotting was implemented as a helper function.
+It used `matplotlib`'s OOP `subplots` implentation instead of plotting imperatively with `pyplot`.
+
+Unit tests focused primarily on the `Returns` and `RiskMetric` classes, as analytical solutions could easily be found and asserted.
+Other tests were either asserting lookup values from the sample data, or 'integration' (if a code runs).
+
+
 ## To do
 
 - [x] Test calculation of returns.
@@ -87,15 +114,16 @@ Thereafter, `Strategy().evalStrategy()` is called to evaluate the portfolio perf
 - [ ] Refactor `date` from `str` to a real `datetime` object.
 - [ ] Use `logging` library instead of `print` statements.
 - [ ] Persist results of `Strategy` evaluation.
+- [ ] Fix potential race condition when switching data sources.
 - [ ] Add MC simulation to compute VaR based on backtest statistics.
 
 
 ## Feedbacks
 
 - [ ] Use dependency injection in `Market` class. User inject a `Connector`.
-- [ ] Fix potential race condition when switching data sources.
 - [ ] Test the strategies! Do it by hand or something.
 - [ ] Test `Portfolio`. See? Bug in constructor.
 - [x] Add superclass `BPStrategy`.
 - [ ] Call superclass constructor when necessary.
 - [x] Mutables in constructor default arguments are instantiated only once! Subsequent instances will be sharing the same object! Use `None` and put the instantiation inside the constructor.
+- [ ] `WorstBPStrategy` should also be long-only. It is only shorted in the long-short strategy.

@@ -1,5 +1,5 @@
 import numpy as np
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any, Optional, Tuple, List
 
 from apogeebacktest.strategies import Strategy
@@ -12,15 +12,17 @@ from apogeebacktest.data import Market
 class BPStrategy(Strategy):
     """A strategy that selects porftolio based on book-to-price ratios."""
 
-    def __init__(self, selection:float=0.2, initial_portfolio:Portfolio=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
         """Constructor.
 
         Parameters
         ----------
-        selection: float
-            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
         initial_portfolio : Portfolio
             Initial portfolio holding, if any.
+        selection : float
+            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
+        timeframe : np.array
+            Timeframe to trade this strategy.
         """
         super().__init__()
         self.selection = selection
@@ -28,7 +30,8 @@ class BPStrategy(Strategy):
             initial_portfolio = Portfolio()
         self._portfolio = initial_portfolio
         self.__market = Market()
-        self._timeframe = self.__market.getTimeframe()
+        if timeframe is None:
+            self._timeframe = self.__market.getTimeframe()
 
 
     @property
@@ -53,8 +56,6 @@ class BPStrategy(Strategy):
         date : Any
             Date on which the portfolio is updated.
             Remember that the performance evaluation must be done at a later date.
-        selection: float
-            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
         """
         pass
 
@@ -91,17 +92,19 @@ class BPStrategy(Strategy):
 class BestBPStrategy(BPStrategy):
     """A strategy that longs an equal-weight porftolio of stocks with the highest book-to-price ratios."""
 
-    def __init__(self, selection:float=0.2, initial_portfolio:Portfolio=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
         """Constructor.
 
         Parameters
         ----------
-        selection: float
-            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
         initial_portfolio : Portfolio
             Initial portfolio holding, if any.
+        selection : float
+            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
+        timeframe : np.array
+            Timeframe to trade this strategy.
         """
-        super().__init__(selection, initial_portfolio)
+        super().__init__(initial_portfolio, selection, timeframe)
 
 
     def updatePortfolio(self, date:Any) -> None:
@@ -125,17 +128,19 @@ class BestBPStrategy(BPStrategy):
 class WorstBPStrategy(BPStrategy):
     """A strategy that shorts an equal-weight porftolio of stocks with the lowest book-to-price ratios."""
 
-    def __init__(self, selection:float=0.2, initial_portfolio:Portfolio=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
         """Constructor.
 
         Parameters
         ----------
-        selection: float
-            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
         initial_portfolio : Portfolio
             Initial portfolio holding, if any.
+        selection : float
+            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
+        timeframe : np.array
+            Timeframe to trade this strategy.
         """
-        super().__init__(selection, initial_portfolio)
+        super().__init__(initial_portfolio, selection, timeframe)
 
 
     def updatePortfolio(self, date:Any) -> None:
@@ -160,17 +165,19 @@ class LongShortBPStrategy(BPStrategy):
     """A strategy that longs an equal-weight porftolio of stocks with the highest 
     book-to-price ratios and shorts the lowest book-to-price ratios."""
 
-    def __init__(self, selection:float=0.2, initial_portfolio:Portfolio=None):
+    def __init__(self, initial_portfolio:Optional[Portfolio]=None, selection:float=0.2, timeframe:Optional[np.ndarray]=None):
         """Constructor.
 
         Parameters
         ----------
-        selection: float
-            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
         initial_portfolio : Portfolio
             Initial portfolio holding, if any.
+        selection : float
+            Proportion of stocks with the best/worst-performing book-to-price ratios to include in the portfolio.
+        timeframe : np.array
+            Timeframe to trade this strategy.
         """
-        super().__init__(selection, initial_portfolio)
+        super().__init__(initial_portfolio, selection, timeframe)
 
 
     def updatePortfolio(self, date:Any) -> None:

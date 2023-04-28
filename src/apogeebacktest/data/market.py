@@ -42,7 +42,7 @@ class __Market:
             A `Connector` object.
         """
         if connector.name in self.__registry:
-            raise KeyError('Data source already registered.')
+            raise KeyError(f'Data source {connector.name} already registered.')
         self.__registry[connector.name] = connector
 
 
@@ -55,7 +55,7 @@ class __Market:
             A `Connector` object.
         """
         if connector.name not in self.__registry:
-            raise KeyError('Data source not registered.')
+            raise KeyError(f'Data source {connector.name} not registered.')
         self.__registry[connector.name] = connector
         self._clearCaches()
 

@@ -78,7 +78,8 @@ def parallel_eval(strategy_instance:Strategy, connectors:List[Connector]) -> Tup
     """
     from apogeebacktest.data import Market
     for connector in connectors:
-        Market.addDataSource(connector)
+        if not Market.hasDataSource(connector.name):
+            Market.addDataSource(connector)
     return strategy_instance.evalStrategy()
 
 
@@ -137,9 +138,12 @@ def main_cli(args:Optional[List[str]]=None):
         data_path = pathlib.Path(args.data).resolve()
         if args.verbose:
             print(f'Setting data source to {data_path}')
+
+    connectors = []
     returns_source = PandasXLSXConnector('returns', load_dataframe, {'data_path': data_path, 'sheet_name': 'Return'})
     bpratio_source = PandasXLSXConnector('bpratio', load_dataframe, {'data_path': data_path, 'sheet_name': 'Book to price'})
-    connectors = [returns_source, bpratio_source]
+    connectors.append(returns_source)
+    connectors.append(bpratio_source)
     from apogeebacktest.data import Market
     if not Market.hasDataSource('returns'):
         Market.addDataSource(returns_source)

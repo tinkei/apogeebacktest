@@ -34,6 +34,7 @@ def load_dataframe(data_path:pathlib.Path, sheet_name:Optional[str]=None) -> Tup
 
 # @pytest.fixture(scope='session')
 def init_market():
+    """Poor man's init now that dependency injection is used to attach data sources to `Market`."""
     if not Market.hasDataSource():
         resources_folder = (pathlib.Path(__file__) / '../../resources' ).resolve()
         data_path = (resources_folder / 'dataset.xlsx').resolve()

@@ -2,6 +2,8 @@ import numpy as np
 from functools import reduce
 
 from apogeebacktest.utils import GeomReturn, LogReturn
+from apogeebacktest.tests.test_helper import init_market
+init_market()
 
 
 def test_Returns_static():

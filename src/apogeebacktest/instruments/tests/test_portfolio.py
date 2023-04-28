@@ -1,4 +1,6 @@
 from apogeebacktest.instruments import Portfolio
+from apogeebacktest.tests.test_helper import init_market
+init_market()
 
 
 def test_Portfolio():

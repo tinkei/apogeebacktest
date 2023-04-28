@@ -60,6 +60,24 @@ class __Market:
         self._clearCaches()
 
 
+    def hasDataSource(self, connector_name:Optional[str]=None) -> np.ndarray:
+        """Check if the data source is already registered.
+
+        Parameters
+        ----------
+        connector_name : str
+            The data source's name.
+
+        Returns
+        -------
+        bool
+            If the data source is already attached.
+        """
+        if connector_name is None:
+            connector_name = self._default_connector
+        return connector_name in self.__registry
+
+
     def _clearCaches(self) -> None:
         """Clear cache for all functions with `lru_cache` decorator."""
         self.getTimeframe.cache_clear()

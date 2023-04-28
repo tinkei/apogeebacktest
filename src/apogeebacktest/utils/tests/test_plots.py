@@ -4,6 +4,8 @@ import tempfile
 import apogeebacktest
 from apogeebacktest.strategies import MarketStrategy, LongShortBPStrategy
 from apogeebacktest.utils import plot_performance
+from apogeebacktest.tests.test_helper import init_market
+init_market()
 
 
 def test_Plots():

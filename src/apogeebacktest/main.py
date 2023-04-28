@@ -141,8 +141,10 @@ def main_cli(args:Optional[List[str]]=None):
     bpratio_source = PandasXLSXConnector('bpratio', load_dataframe, {'data_path': data_path, 'sheet_name': 'Book to price'})
     connectors = [returns_source, bpratio_source]
     from apogeebacktest.data import Market
-    Market.addDataSource(returns_source)
-    Market.addDataSource(bpratio_source)
+    if not Market.hasDataSource('returns'):
+        Market.addDataSource(returns_source)
+    if not Market.hasDataSource('bpratio'):
+        Market.addDataSource(bpratio_source)
 
     # Backtest strategies.
     if args.verbose:

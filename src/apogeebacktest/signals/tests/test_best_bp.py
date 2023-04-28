@@ -1,6 +1,8 @@
 import numpy as np
 
 from apogeebacktest.signals import BestBPSignal
+from apogeebacktest.tests.test_helper import init_market
+init_market()
 
 
 def test_BestBPSignal():

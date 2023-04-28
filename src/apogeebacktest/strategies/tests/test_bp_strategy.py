@@ -1,4 +1,6 @@
 from apogeebacktest.strategies import BestBPStrategy, WorstBPStrategy, LongShortBPStrategy
+from apogeebacktest.tests.test_helper import init_market
+init_market()
 
 
 def test_BestBPStrategy():

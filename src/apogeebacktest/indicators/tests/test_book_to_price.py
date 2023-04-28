@@ -1,6 +1,8 @@
 import numpy as np
 
 from apogeebacktest.indicators import BookToPriceIndicator
+from apogeebacktest.tests.test_helper import init_market
+init_market()
 
 
 def test_BookToPriceIndicator():

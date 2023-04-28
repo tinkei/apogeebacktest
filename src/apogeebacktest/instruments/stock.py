@@ -10,6 +10,7 @@ class Stock(Instrument):
         super(Stock, self).__init__(**kwargs)
         from apogeebacktest.data import Market
         self.__market = Market()
+        self.__default_connector_name = 'returns' # Hardcoded for now.
         self._code = code
         self._name = self.__market.getName(self._code)
 
@@ -54,4 +55,4 @@ class Stock(Instrument):
         float
             Monthly geometric return.
         """
-        return self.__market.getReturn(self._code, date)
+        return self.__market.getData(self.__default_connector_name, self._code, date)

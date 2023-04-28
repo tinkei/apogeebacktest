@@ -6,11 +6,12 @@ import inspect
 import argparse
 import pathlib
 import numpy as np
+import pandas as pd
 from multiprocessing import Pool
 from typing import Optional, List, Tuple
 
 import apogeebacktest.strategies
-from apogeebacktest.data import Market
+from apogeebacktest.data import Connector, PandasXLSXConnector
 from apogeebacktest.risks import VaR, CVaR
 from apogeebacktest.utils import plot_performance
 from apogeebacktest.utils import GeomReturn, LogReturn
@@ -60,9 +61,51 @@ def parse_arguments(args:List[str]) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-def parallel_eval(strategy_name:str, strategy_instance:Strategy) -> Tuple[np.array, np.array, np.array]:
-    """Wrapper for `multiprocessing.Pool.apply_async()`."""
+def parallel_eval(strategy_instance:Strategy, connectors:List[Connector]) -> Tuple[np.array, np.array, np.array]:
+    """Wrapper for `multiprocessing.Pool.apply_async()`.
+
+    Parameters
+    ----------
+    strategy_instance : Strategy
+        A `Strategy` instance to backtest.
+    connectors : List[Connector]
+        A list of `Connector` objects.
+
+    Returns
+    -------
+    Tuple[np.array, np.array, np.array]
+        A tuple of (timeframe, geom_returns, log_returns)
+    """
+    from apogeebacktest.data import Market
+    for connector in connectors:
+        Market.addDataSource(connector)
     return strategy_instance.evalStrategy()
+
+
+def load_dataframe(data_path:pathlib.Path, sheet_name:Optional[str]=None) -> Tuple[pd.DataFrame, pathlib.Path]:
+    """User-injected custom processing logic to parse your particular Excel file.
+
+    Load a `.xlsx` data source into pandas.DataFrame.
+    Indices are stock code, and columns are date.
+
+    Parameters
+    ----------
+    data_path : pathlib.Path
+        Path to the data file.
+    sheet_name : str
+        Name of the Excel sheet.
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, pathlib.Path]
+        The parsed dataframe and the path to the data source.
+    """
+    df = pd.read_excel(data_path, sheet_name=sheet_name, index_col=0)
+    df.index = [name.split(' ')[1] for name in df.index]
+    df.index = df.index.astype(int)
+    df.sort_index(inplace=True)
+    df.columns = df.columns.astype(str)
+    return df, data_path
 
 
 def main_cli(args:Optional[List[str]]=None):
@@ -83,14 +126,25 @@ def main_cli(args:Optional[List[str]]=None):
         print('==============================')
         print('                              ')
 
-    if args.data is not None:
+    # Setup data sources.
+    if args.data is None:
+        # Load default market data.
+        resources_folder = (pathlib.Path(__file__) / '../resources' ).resolve()
+        data_path = (resources_folder / 'dataset.xlsx').resolve()
         if args.verbose:
-            print(f'Setting data source to {args.data}')
-        Market.switchReturnsDataSource(args.data)
-        Market.switchBookToPriceDataSource(args.data)
-    if args.verbose:
-        print(f'Current data source: {Market.getDataPath()}\n')
+            print(f'Using default data source at {data_path}.')
+    else:
+        data_path = pathlib.Path(args.data).resolve()
+        if args.verbose:
+            print(f'Setting data source to {data_path}')
+    returns_source = PandasXLSXConnector('returns', load_dataframe, {'data_path': data_path, 'sheet_name': 'Return'})
+    bpratio_source = PandasXLSXConnector('bpratio', load_dataframe, {'data_path': data_path, 'sheet_name': 'Book to price'})
+    connectors = [returns_source, bpratio_source]
+    from apogeebacktest.data import Market
+    Market.addDataSource(returns_source)
+    Market.addDataSource(bpratio_source)
 
+    # Backtest strategies.
     if args.verbose:
         print('Going to backtest the following strategies:')
     strategies_to_execute = []
@@ -110,10 +164,11 @@ def main_cli(args:Optional[List[str]]=None):
     all_log_returns = {}
 
     with Pool(processes=min(8, len(strategies_to_execute))) as pool:
-        strategies_executed = [pool.apply_async(parallel_eval, (strategy[0], strategy[1]())) for strategy in strategies_to_execute]
+        strategies_executed = [pool.apply_async(parallel_eval, (strategy[1](), connectors)) for strategy in strategies_to_execute]
         for strategy, res in zip(strategies_to_execute, strategies_executed):
-            # timeframe, geom_returns, log_returns = strategy[1]().evalStrategy()
             timeframe, geom_returns, log_returns = res.get()
+        # for strategy in strategies_to_execute:
+        #     timeframe, geom_returns, log_returns = strategy[1]().evalStrategy()
             all_timeframe[strategy[0]] = timeframe
             all_returns[strategy[0]] = geom_returns
             all_log_returns[strategy[0]] = log_returns
@@ -130,7 +185,7 @@ def main_cli(args:Optional[List[str]]=None):
     plot_performance(args.output_path, strategies_to_execute, all_timeframe, all_returns, all_log_returns)
 
     if args.verbose:
-        print('                              ')
+        # print('                              ')
         print('==============================')
         print('=====   End of program   =====')
         print('==============================')

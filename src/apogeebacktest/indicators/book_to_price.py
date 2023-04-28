@@ -10,6 +10,7 @@ class BookToPriceIndicator(Indicator):
     def __init__(self, **kwargs) -> None:
         super(BookToPriceIndicator, self).__init__(**kwargs)
         self.__market = Market()
+        self.__default_connector_name = 'bpratio' # Hardcoded for now.
 
 
     def getValue(self, code:str, date:Any) -> float:
@@ -27,4 +28,4 @@ class BookToPriceIndicator(Indicator):
         float
             Book-to-Price ratio.
         """
-        return self.__market.getBP(code, date)
+        return self.__market.getData(self.__default_connector_name, code, date)

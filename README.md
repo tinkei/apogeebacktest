@@ -24,11 +24,30 @@ A backtest package for a long-short strategy using book-to-price ratio[^1].
 In a project one can extend the base `Strategy` and evaluate the result as follow:
 
 ```python
+import pathlib
 import numpy as np
-from apogeebacktest.strategies import MarketStrategy, LongShortBPStrategy
+import pandas as pd
+from apogeebacktest.data import Market, Connector, PandasXLSXConnector
 from apogeebacktest.utils import GeomReturn, LogReturn
 from apogeebacktest.risks import VaR, CVaR
+from apogeebacktest.strategies import MarketStrategy, LongShortBPStrategy
 
+# Setup data sources.
+def load_dataframe(data_path:pathlib.Path, sheet_name:Optional[str]=None) -> Tuple[pd.DataFrame, pathlib.Path]:
+    df = pd.read_excel(data_path, sheet_name=sheet_name, index_col=0)
+    df.index = [name.split(' ')[1] for name in df.index]
+    df.index = df.index.astype(int)
+    df.sort_index(inplace=True)
+    df.columns = df.columns.astype(str)
+    return df, data_path
+resources_folder = (Path(__file__) / '../resources' ).resolve()
+data_path = (resources_folder / 'dataset.xlsx').resolve()
+returns_source = PandasXLSXConnector('returns', load_dataframe, {'data_path': data_path, 'sheet_name': 'Return'})
+bpratio_source = PandasXLSXConnector('bpratio', load_dataframe, {'data_path': data_path, 'sheet_name': 'Book to price'})
+Market.addDataSource(returns_source)
+Market.addDataSource(bpratio_source)
+
+# Backtest strategies.
 baseline = MarketStrategy()
 strategy = LongShortBPStrategy()
 timeframe_base, geom_returns_base, log_returns_base = baseline.evalStrategy()
@@ -71,7 +90,9 @@ A plot summarizing the performance will be created at `./backtest-output/Perform
 
 ## Under the hood
 
-A `Market` connects to a data source (currently only the sample `.xlsx` file) to obtain various information about an `Instrument` (e.g. its return and book-to-price ratio).
+The user provides the data parsing logic to a data source `Connector` (currently only the sample `.xlsx` file). A `Market` singleton[^2] then connects to a list of `Connector`s to obtain various data about an `Instrument` (e.g. its return and book-to-price ratio).
+
+[^2]: The `Market` singleton isn't really a singleton when `multiprocessing` is used. It is only a singleton within the same process.
 
 A (user-implemented subclass of) `Strategy` makes long and/or short trades in a `Market`. The selection of `Instrument`s to buy/sell in a `Portfolio` over time is based on a set of trading `Signal`s (a.k.a. _Attractiveness Score_), each of which is composed of a set of `Indicator`s (e.g. book-to-price ratio) computed from `Market` data.
 
@@ -96,7 +117,7 @@ Next, a `Portfolio` class was implemented to keep track of the current holdings.
 Algorithms for computing returns were implmented both as static methods and using the method chaining.
 The latter was done to simplify reduction over portfolio returns and returns over time, and the conversion between geometric returns and logarithmic returns.
 
-The data I/O was abstracted to hide behind a `Market` singleton interface, with the data sources passed during construction through `Connector` objects (mentioned, but not implemented).
+The data I/O was abstracted to hide behind a `Market` singleton interface, with the data sources attached via `Connector` objects.
 
 Finally, the plotting was implemented as a helper function.
 It used `matplotlib`'s OOP `subplots` implentation instead of plotting imperatively with `pyplot`.
@@ -120,10 +141,10 @@ Other tests were either asserting lookup values from the sample data, or 'integr
 
 ## Feedbacks
 
-- [ ] Use dependency injection in `Market` class. User inject a `Connector`.
+- [x] Use dependency injection in `Market` class. Users should provide their own `Connector`s, as well as parsing logic to the `PandasXLSXConnector`.
 - [ ] Test the strategies! Do it by hand or something.
-- [ ] Test `Portfolio`. See? Bug in constructor.
+- [ ] Test `Portfolio`. There is already a typo in the constructor involving `len(codes_short)`.
 - [x] Add superclass `BPStrategy`.
 - [x] Call superclass constructor when necessary.
-- [x] Mutables in constructor default arguments are instantiated only once! Subsequent instances will be sharing the same object! Use `None` and put the instantiation inside the constructor.
-- [ ] `WorstBPStrategy` should also be long-only. It is only shorted in the long-short strategy.
+- [x] Mutables in constructor default arguments are instantiated only once. Subsequent instances will be sharing the same object! Use `None` and put the instantiation inside the constructor.
+- [ ] `WorstBPStrategy` should be long-only. It is only shorted in the long-short strategy.

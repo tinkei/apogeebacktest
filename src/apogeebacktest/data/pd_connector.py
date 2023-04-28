@@ -1,59 +1,84 @@
 """A thin wrapper over a pandas.DataFrame instance."""
+import pathlib
 import numpy as np
 import pandas as pd
-from pathlib import Path
-from typing import Any, Optional, List
+from typing import Any, Optional, Callable, Tuple, Dict
 
 from apogeebacktest.data import Connector
-from apogeebacktest.instruments import Instrument, Stock
 
 
 class PandasXLSXConnector(Connector):
-    """A thin wrapper over a pandas.DataFrame instance."""
+    """A thin wrapper over a `pandas.DataFrame` instance."""
 
-    def __init__(self, data_path:str, sheet_name:Optional[str]=None, **kwargs) -> None:
-        super(PandasXLSXConnector, self).__init__(**kwargs)
-        self.__data_path = data_path
-        self._loadDataFrame(data_path, sheet_name)
-
-
-    def _loadDataFrame(self, data_path:str, sheet_name:Optional[str]=None) -> None:
-        """Load a `.xlsx` data source into pandas.DataFrame.
+    def __init__(self, name:str, load_func:Callable, func_args:Dict[str,Any], **kwargs) -> None:
+        """Constructor.
 
         Parameters
         ----------
-        data_path : str
+        name : str
+            The name of the connector. Must be unique within a `Market`.
+        load_func : Callable
+            User-defined function to parse their custom `.xlsx` file into `pandas.DataFrame`.
+        func_args : Dict[str,Any]
+            Arguments to the aforementioned user-defined function.
+        """
+        super(PandasXLSXConnector, self).__init__(name, **kwargs)
+        self._loadDataFrame = load_func
+        self.__df, self.__data_path = self._loadDataFrame(**func_args)
+
+
+    @staticmethod
+    def _loadDataFrame(data_path:pathlib.Path, sheet_name:Optional[str]=None) -> Tuple[pd.DataFrame, pathlib.Path]:
+        """User-injected custom processing logic to parse your particular Excel file.
+
+        Load a `.xlsx` data source into pandas.DataFrame.
+        Indices are stock code, and columns are date.
+        This is a reference implementation.
+        This function is replaced upon `__init__` and is never called.
+
+        Parameters
+        ----------
+        data_path : pathlib.Path
             Path to the data file.
         sheet_name : str
             Name of the excel sheet.
+
+        Returns
+        -------
+        Tuple[pd.DataFrame, pathlib.Path]
+            The parsed dataframe and the path to the data source.
         """
+        raise NotImplementedError
 
         df = pd.read_excel(data_path, sheet_name=sheet_name, index_col=0)
         df.index = [name.split(' ')[1] for name in df.index]
         df.index = df.index.astype(int)
         df.sort_index(inplace=True)
         df.columns = df.columns.astype(str)
-        self.__df = df
+        return df, data_path
 
 
-    def switchDataSource(self, data_path:str, sheet_name:Optional[str]=None) -> None:
+    def switchDataFrame(self, func_args) -> None:
         """Switch to another `.xlsx` data source.
+
+        Not implemented because it will break the cache in `Market`.
 
         Parameters
         ----------
-        data_path : str
-            Path to the data file.
-        sheet_name : str
-            Name of the excel sheet.
+        func_args : Dict[str,Any]
+            Arguments to the user-defined `_loadDataFrame()` function.
         """
-
-        data_path = Path(data_path).resolve()
-        self.__data_path = data_path
-        self._loadDataFrame(data_path, sheet_name)
+        raise NotImplementedError
+        self.__df, self.__data_path = self._loadDataFrame(**func_args)
 
 
-    def getDataPath(self) -> Path:
-        """Get file path to current data source."""
+    def getDataPath(self) -> pathlib.Path:
+        """Get file path to current data source.
+
+        Returns
+        -------
+        pathlib.Path
+            The file path to the data source."""
         return self.__data_path
 
 
@@ -92,6 +117,6 @@ class PandasXLSXConnector(Connector):
         Returns
         -------
         float
-            Return
+            Data point
         """
         return self.__df.loc[int(code), date]
